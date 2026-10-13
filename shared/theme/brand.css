@@ -1,0 +1,138 @@
+/* ══════════════════════════════════════════════════════════════════════
+   Elements Energy brand tokens on top of the Preline theme.
+
+   - Fixed palette colours become Tailwind colours: `bg-g-soft`, `text-ink-3`…
+   - Role-dependent colours are CSS variables, switched by `data-dashboard`
+     on the shell: `accent-*` (green for Employee/HR, purple for Admin),
+     `canvas` (page background) and Preline's `border` + `primary-*` scale,
+     so stock Preline components pick up the same brand colour.
+   Keep in sync with tokens.ts (used for chart colours and dynamic styles).
+   ══════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  --font-sans: var(--font-jakarta), "Plus Jakarta Sans", var(--font-lato), "Lato", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", "SF Mono", Menlo, monospace;
+
+  --color-p: #8B5CF6;
+  --color-p-dark: #7C3AED;
+  --color-p-deep: #5B21B6;
+  --color-p-light: #A78BFA;
+  --color-p-soft: #EDE9FE;
+  --color-p-mist: #F5F3FF;
+  --color-p-bg: #FAFAFC;
+
+  --color-g: #10B981;
+  --color-g-dark: #059669;
+  --color-g-deep: #047857;
+  --color-g-light: #34D399;
+  --color-g-soft: #D1FAE5;
+  --color-g-mist: #ECFDF5;
+  --color-g-bg: #F6FBF8;
+
+  --color-a: #F59E0B;
+  --color-a-dark: #D97706;
+  --color-a-soft: #FEF3C7;
+  --color-a-mist: #FFFBEB;
+
+  --color-b: #3B82F6;
+  --color-b-dark: #2563EB;
+  --color-b-soft: #DBEAFE;
+
+  --color-err: #EF4444;
+  --color-err-soft: #FEE2E2;
+  --color-warn: #F59E0B;
+  --color-info: #3B82F6;
+  --color-info-soft: #DBEAFE;
+
+  --color-gold: #F59E0B;
+  --color-silver: #9CA3AF;
+  --color-bronze: #D97706;
+
+  --color-paper: #FFFFFF;
+  --color-border-strong: #D1D5DB;
+  --color-ink: #0F172A;
+  --color-ink-2: #334155;
+  --color-ink-3: #64748B;
+  --color-mute: #94A3B8;
+  --color-faint: #CBD5E1;
+}
+
+@theme inline {
+  --color-canvas: var(--brand-canvas);
+  --color-accent: var(--brand-accent);
+  --color-accent-dark: var(--brand-accent-dark);
+  --color-accent-deep: var(--brand-accent-deep);
+  --color-accent-light: var(--brand-accent-light);
+  --color-accent-soft: var(--brand-accent-soft);
+  --color-accent-mist: var(--brand-accent-mist);
+}
+
+/* Green — Employee + HR Management (default) */
+:root,
+[data-dashboard="employee"],
+[data-dashboard="management"] {
+  --brand-canvas: #F7F9F8;
+  --brand-accent: #10B981;
+  --brand-accent-dark: #059669;
+  --brand-accent-deep: #047857;
+  --brand-accent-light: #34D399;
+  --brand-accent-soft: #D1FAE5;
+  --brand-accent-mist: #ECFDF5;
+
+  --border: #E5E9EB;
+  --primary-50: #ECFDF5;
+  --primary-100: #D1FAE5;
+  --primary-200: #A7F3D0;
+  --primary-300: #6EE7B7;
+  --primary-400: #34D399;
+  --primary-500: #10B981;
+  --primary-600: #059669;
+  --primary-700: #047857;
+  --primary-800: #065F46;
+  --primary-900: #064E3B;
+  --primary-950: #022C22;
+  --primary: var(--primary-500);
+  --primary-hover: var(--primary-600);
+  --primary-focus: var(--primary-600);
+  --primary-active: var(--primary-600);
+}
+
+/* Purple — Admin */
+[data-dashboard="admin"] {
+  --brand-canvas: #F8F7FB;
+  --brand-accent: #8B5CF6;
+  --brand-accent-dark: #7C3AED;
+  --brand-accent-deep: #5B21B6;
+  --brand-accent-light: #A78BFA;
+  --brand-accent-soft: #EDE9FE;
+  --brand-accent-mist: #F5F3FF;
+
+  --border: #E8E6EE;
+  --primary-50: #F5F3FF;
+  --primary-100: #EDE9FE;
+  --primary-200: #DDD6FE;
+  --primary-300: #C4B5FD;
+  --primary-400: #A78BFA;
+  --primary-500: #8B5CF6;
+  --primary-600: #7C3AED;
+  --primary-700: #6D28D9;
+  --primary-800: #5B21B6;
+  --primary-900: #4C1D95;
+  --primary-950: #2E1065;
+  /* re-declared so they resolve against this scale, not the inherited one */
+  --primary: var(--primary-500);
+  --primary-hover: var(--primary-600);
+  --primary-focus: var(--primary-600);
+  --primary-active: var(--primary-600);
+}
+
+@layer base {
+  /* The dashboards were designed on the browser default line-height,
+     not Tailwind preflight's 1.5. */
+  html { line-height: normal; }
+  button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--brand-accent-light); outline-offset: 2px; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--color-faint); border-radius: 4px; }
+}

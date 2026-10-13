@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Preline UI */
+@source "../node_modules/preline/dist/*.js";
+@import "../node_modules/preline/variants.css";
+@import "../node_modules/preline/css/themes/theme.css";
+
+/* Elements Energy brand (overrides Preline's primary/border per dashboard) */
+@import "../shared/theme/brand.css";
