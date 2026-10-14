@@ -28,10 +28,12 @@ export const InboxView = ({ chats, messages, initialChatId, groupOnlineCount, la
   );
   const [draft, setDraft] = useState("");
   const [search, setSearch] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const threadRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Scroll only the message thread (scrollIntoView would also scroll the page).
+    const el = threadRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [selected]);
 
   const filteredChats = chats.filter(c =>
@@ -39,17 +41,17 @@ export const InboxView = ({ chats, messages, initialChatId, groupOnlineCount, la
   );
 
   return (
-    <div>
+    <div className="flex-1 min-h-0 flex flex-col">
       <PageHeader
         title="Inbox"
         sub={`${chats.filter(c => c.unread> 0).length} unread · ${chats.filter(c => c.isGroup).length} groups · ${chats.filter(c => !c.isGroup).length} direct chats`}
         action={<Btn variant="primary" icon={Plus}>New chat</Btn>}
       />
 
-      <Card padding={0} className="overflow-hidden h-[calc(100vh_-_240px)] min-h-150">
-        <div className="grid grid-cols-[340px_1fr] h-full">
+      <Card padding={0} className="flex-1 min-h-105 overflow-hidden">
+        <div className="grid grid-cols-[340px_1fr] grid-rows-1 h-full">
           {/* Chat list — left */}
-          <div className="border-r border-r-border bg-canvas flex flex-col">
+          <div className="border-r border-r-border bg-canvas flex flex-col min-h-0">
             {/* Search */}
             <div className="p-3.5 border-b border-b-border bg-paper">
               <div className="flex items-center gap-2.25 bg-canvas border border-border rounded-[10px] py-2 px-3">
@@ -97,7 +99,7 @@ export const InboxView = ({ chats, messages, initialChatId, groupOnlineCount, la
 
           {/* Chat window — right */}
           {selected ? (
-            <div className="flex flex-col bg-[#F7F5F0]" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, ${T.border} 1px, transparent 0)`, backgroundSize: "24px 24px" }}>
+            <div className="flex flex-col min-h-0 bg-[#F7F5F0]" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, ${T.border} 1px, transparent 0)`, backgroundSize: "24px 24px" }}>
               {/* Chat header */}
               <div className="py-3.5 px-5 bg-paper border-b border-b-border flex items-center gap-3">
                 {selected.isGroup ? (
@@ -125,7 +127,7 @@ export const InboxView = ({ chats, messages, initialChatId, groupOnlineCount, la
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto py-5 px-6">
+              <div ref={threadRef} className="flex-1 overflow-y-auto py-5 px-6">
                 <div className="text-center mb-4">
                   <span className="bg-[rgba(255,255,255,0.9)] py-1 px-2.75 rounded-full text-[10.5px] text-ink-3 font-bold tracking-[0.3px]">Today</span>
                 </div>
@@ -140,7 +142,6 @@ export const InboxView = ({ chats, messages, initialChatId, groupOnlineCount, la
                     </div>
                   </div>
                 ))}
-                <div ref={messagesEndRef}/>
               </div>
 
               {/* Message input */}

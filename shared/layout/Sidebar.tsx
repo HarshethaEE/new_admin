@@ -15,7 +15,7 @@ const ITEM = "w-full flex items-center gap-2.75 py-2.25 px-3 mb-0.5 rounded-[9px
 export const Sidebar = ({ config }: { config: DashboardConfig }) => {
   const pathname = usePathname();
   return (
-    <aside className="sticky top-0 w-62 shrink-0 min-h-screen flex flex-col bg-paper border-e border-border">
+    <aside className="w-62 shrink-0 h-full flex flex-col bg-paper border-e border-border">
       <div className="py-4.5 px-5 border-b border-border">
         <Logo size={config.logo.size} label={config.logo.label} accentLabel={config.logo.accentLabel}/>
       </div>
