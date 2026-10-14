@@ -1,7 +1,0 @@
-{
-  "/icon.svg/route": "app/icon.svg/route.js",
-  "/employee/page": "app/employee/page.js",
-  "/employee/inbox/page": "app/employee/inbox/page.js",
-  "/management/page": "app/management/page.js",
-  "/admin/page": "app/admin/page.js"
-}
