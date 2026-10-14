@@ -23,9 +23,9 @@ const employee: DashboardConfig = {
   searchPlaceholder: "Search anything",
   nav: [
     { slug: "home",        label: "Dashboard",         icon: LayoutDashboard },
-    { slug: "inbox",       label: "Inbox",             icon: Inbox, badge: 6 },
-    { slug: "calendar",    label: "Calendar",          icon: CalendarIcon },
     { slug: "projects",    label: "Projects & Tasks",  icon: FolderKanban, badge: TASKS.filter(t => t.assignee === "me" && t.status !== "completed").length },
+    { slug: "calendar",    label: "Calendar",          icon: CalendarIcon },
+    { slug: "inbox",       label: "Inbox",             icon: Inbox, badge: 6 },
     { slug: "travel",      label: "Travel & Expenses", icon: Plane },
     { slug: "attendance",  label: "Attendance",        icon: Clock },
     { slug: "leave",       label: "Leave",             icon: FileText },
