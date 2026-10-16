@@ -75,10 +75,7 @@ export const EmployeeOverview = () => {
 
             {/* Action buttons */}
             {isCheckedIn ? (
-              <div className={`grid gap-2 ${(isOnBreak ? "grid-cols-[1fr]" : "grid-cols-[1fr_1fr]")}`}>
-                {!isOnBreak && (
-                  <button onClick={() => setIsOnBreak(true)} className="py-2.75 px-4 bg-[rgba(255,255,255,0.15)] text-white border border-[rgba(255,255,255,0.25)] rounded-[10px] font-sans text-[13.5px] font-bold cursor-pointer flex items-center justify-center gap-1.75"><Coffee size={15}/>Start break</button>
-                )}
+              <div className={`grid gap-2 ${(isOnBreak ? "grid-cols-[1fr]" : "grid-cols-[1fr]")}`}>
                 {isOnBreak && (
                   <button onClick={() => setIsOnBreak(false)} className="py-2.75 px-4 bg-a text-white border border-a rounded-[10px] font-sans text-[13.5px] font-bold cursor-pointer flex items-center justify-center gap-1.75"><Play size={15}/>Resume work</button>
                 )}
