@@ -130,47 +130,53 @@ export const FinanceDocs = () => {
             <StatKPI label="Avg deal size" value="₹ 1.4Cr" trend="Trending up" sub=""/>
           </div>
 
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(380px,1fr))] gap-4">
-            {PROPOSALS.map(p => (
-              <Card key={p.id} padding={0} className="overflow-hidden">
-                <div className="py-4.5 px-5">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      <span className="font-mono text-[10.5px] text-ink-3 font-bold tracking-[1px]">{p.id}</span>
-                      <div className="text-[14.5px] font-bold text-ink tracking-[-0.3px] mt-0.75">{p.client}</div>
-                      <div className="text-[11.5px] text-ink-3 mt-1 leading-[1.4]">{p.scope}</div>
-                    </div>
-                    <Pill tone={
-                      p.status === "Won" ? "ok" :
-                      p.status === "Lost" ? "err" :
-                      p.status === "Draft" ? "neutral" :
-                      p.status === "Negotiating" ? "amber" : "primary"
-                    } dot>{p.status}</Pill>
-                  </div>
-
-                  <div className="grid grid-cols-[1fr_1fr] gap-3 mt-3.5 py-3.5 px-0 border-t border-t-border border-b border-b-border">
-                    <div>
-                      <div className="text-[10px] text-ink-3 font-extrabold tracking-[1.2px] uppercase">Deal value</div>
-                      <div className={`text-[17px] font-extrabold font-mono mt-1 ${(p.status === "Won" ? "text-g-deep" : "text-ink")}`}>₹ {(p.value/10000000).toFixed(2)}Cr</div>
-                    </div>
-                    <div>
-                      <div className="text-[10px] text-ink-3 font-extrabold tracking-[1.2px] uppercase">{p.status === "Sent" || p.status === "Negotiating" ? "Expires" : "Sent"}</div>
-                      <div className="text-[13px] font-bold text-ink mt-1">{p.status === "Draft" || p.status === "Won" || p.status === "Lost" ? p.sent : p.expires}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center mt-3.5">
-                    <span className="text-[11.5px] text-ink-3 italic">{p.stage}</span>
-                    <div className="flex gap-1.5">
-                      <Btn variant="ghost" size="sm" icon={Eye}>Open</Btn>
-                      {p.status === "Draft" && <Btn variant="primary" size="sm" icon={Send}>Send</Btn>}
-                      {(p.status === "Sent" || p.status === "Negotiating") && <Btn variant="primary" size="sm" icon={Edit3}>Revise</Btn>}
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          <Card padding={0}>
+            <div className="overflow-x-auto">
+              <table className="w-full font-sans" style={{ borderCollapse: "collapse" }}>
+                <thead>
+                  <tr className="bg-canvas">
+                    {["Proposal", "Client", "Stage", "Deal value", "Sent / Expires", "Status", ""].map((h, i) => (
+                      <th key={i} className={`py-2.75 px-4 text-[10.5px] font-extrabold tracking-[1.4px] uppercase text-ink-3 border-b border-b-border whitespace-nowrap ${(i === 6 ? "text-right" : "text-left")}`}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {PROPOSALS.map((p, i, arr) => (
+                    <tr key={p.id} className={`bg-paper hover:bg-g-bg ${(i < arr.length - 1 ? "border-b border-b-border" : "border-b-0")}`}>
+                      <td className="py-3.25 px-4">
+                        <span className="font-mono text-[11.5px] text-ink-3 font-bold whitespace-nowrap">{p.id}</span>
+                      </td>
+                      <td className="py-3.25 px-4 max-w-80">
+                        <div className="text-[13px] font-bold text-ink">{p.client}</div>
+                        <div className="text-[11px] text-ink-3 mt-0.5 leading-[1.4]">{p.scope}</div>
+                      </td>
+                      <td className="py-3.25 px-4 text-[12px] text-ink-2 italic">{p.stage}</td>
+                      <td className={`py-3.25 px-4 font-mono text-[13.5px] font-extrabold whitespace-nowrap ${(p.status === "Won" ? "text-g-deep" : "text-ink")}`}>₹ {(p.value/10000000).toFixed(2)}Cr</td>
+                      <td className="py-3.25 px-4 whitespace-nowrap">
+                        <div className="text-[10px] text-ink-3 font-extrabold tracking-[1.2px] uppercase">{p.status === "Sent" || p.status === "Negotiating" ? "Expires" : "Sent"}</div>
+                        <div className="text-[12px] font-bold text-ink mt-0.5 font-mono">{p.status === "Draft" || p.status === "Won" || p.status === "Lost" ? p.sent : p.expires}</div>
+                      </td>
+                      <td className="py-3.25 px-4">
+                        <Pill tone={
+                          p.status === "Won" ? "ok" :
+                          p.status === "Lost" ? "err" :
+                          p.status === "Draft" ? "neutral" :
+                          p.status === "Negotiating" ? "amber" : "primary"
+                        } dot>{p.status}</Pill>
+                      </td>
+                      <td className="py-3.25 px-4 text-right">
+                        <div className="flex gap-1.5 justify-end">
+                          <Btn variant="ghost" size="sm" icon={Eye}>Open</Btn>
+                          {p.status === "Draft" && <Btn variant="primary" size="sm" icon={Send}>Send</Btn>}
+                          {(p.status === "Sent" || p.status === "Negotiating") && <Btn variant="primary" size="sm" icon={Edit3}>Revise</Btn>}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
         </>
       )}
     </div>

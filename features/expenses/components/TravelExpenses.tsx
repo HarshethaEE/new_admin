@@ -1,14 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Car, CheckCircle2, Clock, Download, Eye, FileCheck2, Fuel, Hotel, Plane, Plus, Printer, Receipt, Send, Train, Upload, UtensilsCrossed } from "lucide-react";
+import { ArrowRight, Car, CheckCircle2, Clock, Download, Eye, FileCheck2, Fuel, Hotel, Plane, Printer, Receipt, Send, Train, Upload, UtensilsCrossed } from "lucide-react";
 import { greenTheme as T } from "@/shared/theme";
 import { Btn, Card, PageHeader, Pill, StatKPI, X } from "@/shared/ui";
-import { EXPENSES, TRAVEL_REQUESTS, VOUCHERS } from "../data/employee";
+import { EXPENSES, TRAVEL_REQUESTS, VOUCHERS as INITIAL_VOUCHERS } from "../data/employee";
+import { formatDate, type VoucherDetails } from "../lib/buildVoucherPdf";
+import { GenerateVoucherModal } from "./GenerateVoucherModal";
 
 export const TravelExpenses = () => {
   const [tab, setTab] = useState("trips");
   const [showVoucherModal, setShowVoucherModal] = useState(false);
+  const [showGenerate, setShowGenerate] = useState(false);
+  const [VOUCHERS, setVouchers] = useState(INITIAL_VOUCHERS);
+  const nextVoucherNumber = Math.max(...VOUCHERS.map(v => Number(v.id.replace(/\D/g, "")) || 0)) + 1;
+
+  const handleGenerated = (v: VoucherDetails) => {
+    const id = /^\d+$/.test(v.number) ? `VCH-${v.number.padStart(5, "0")}` : v.number;
+    setVouchers(prev => [{ id, trip: v.method, issued: formatDate(v.date), total: v.amount, status: "Generated", paidOn: "", paidTo: v.payee }, ...prev]);
+    setShowGenerate(false);
+    setTab("vouchers");
+  };
+
   const [selectedTrip, setSelectedTrip] = useState(TRAVEL_REQUESTS[2]); // Completed trip, ready for voucher
 
   const tripExpenses = EXPENSES.filter(e => e.trip === selectedTrip?.id);
@@ -23,10 +36,7 @@ export const TravelExpenses = () => {
         title="Travel & Expenses"
         sub="Trip requests, expense tracking, and voucher generation"
         action={
-          <div className="flex gap-2">
-            <Btn variant="ghost" icon={Plus}>New expense</Btn>
-            <Btn variant="primary" icon={Plane}>Request travel</Btn>
-          </div>
+          <Btn variant="primary" icon={FileCheck2} onClick={() => setShowGenerate(true)}>Generate voucher</Btn>
         }
       />
 
@@ -58,61 +68,60 @@ export const TravelExpenses = () => {
 
       {/* TRIPS TAB */}
       {tab === "trips" && (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(380px,1fr))] gap-4">
-          {TRAVEL_REQUESTS.map(t => {
-            const modeIcon = { "Flight": Plane, "Car": Car, "Train": Train }[t.mode] || Plane;
-            const ModeIcon = modeIcon;
-            return (
-              <Card key={t.id} padding={0} className="overflow-hidden">
-                <div className="py-4.5 px-5">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      <span className="font-mono text-[10.5px] text-ink-3 font-bold tracking-[1px]">{t.id}</span>
-                      <div className="text-[14.5px] font-bold text-ink tracking-[-0.3px] mt-0.75">{t.purpose}</div>
-                    </div>
-                    <Pill tone={t.status === "Approved" ? "ok" : t.status === "Pending" ? "amber" : t.status === "Completed" ? "neutral" : "info"} dot>{t.status}</Pill>
-                  </div>
-
-                  <div className="py-3.5 px-4 bg-g-bg rounded-[10px] border border-border mt-3.5">
-                    <div className="flex items-center gap-3.5 mb-2.5">
-                      <div className="w-9 h-9 rounded-[9px] bg-g-soft text-g-deep flex items-center justify-center">
-                        <ModeIcon size={16}/>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-1.75 text-[13px] font-bold text-ink">
-                          <span>{t.from}</span>
-                          <ArrowRight size={13} color={T.ink3}/>
-                          <span>{t.to}</span>
+        <Card padding={0}>
+          <div className="overflow-x-auto">
+            <table className="w-full font-sans" style={{ borderCollapse: "collapse" }}>
+              <thead>
+                <tr className="bg-canvas">
+                  {["Trip", "Purpose", "Route", "Dates", "Budget", "Approver", "Status", ""].map((h, i) => (
+                    <th key={i} className={`py-2.75 px-4 text-[10.5px] font-extrabold tracking-[1.4px] uppercase text-ink-3 border-b border-b-border whitespace-nowrap ${(i === 7 ? "text-right" : "text-left")}`}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {TRAVEL_REQUESTS.map((t, i, arr) => {
+                  const ModeIcon = { "Flight": Plane, "Car": Car, "Train": Train }[t.mode] || Plane;
+                  return (
+                    <tr key={t.id} className={`bg-paper hover:bg-g-bg ${(i < arr.length - 1 ? "border-b border-b-border" : "border-b-0")}`}>
+                      <td className="py-3.25 px-4">
+                        <span className="font-mono text-[11.5px] text-ink-3 font-bold whitespace-nowrap">{t.id}</span>
+                      </td>
+                      <td className="py-3.25 px-4 text-[13px] font-bold text-ink">{t.purpose}</td>
+                      <td className="py-3.25 px-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7.5 h-7.5 rounded-lg bg-g-soft text-g-deep flex items-center justify-center shrink-0">
+                            <ModeIcon size={14}/>
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1.5 text-[12.5px] font-bold text-ink whitespace-nowrap">
+                              <span>{t.from}</span>
+                              <ArrowRight size={12} color={T.ink3}/>
+                              <span>{t.to}</span>
+                            </div>
+                            <div className="text-[11px] text-ink-3 mt-0.5">{t.mode}</div>
+                          </div>
                         </div>
-                        <div className="text-[11px] text-ink-3 mt-0.5">{t.dates} · {t.mode}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-[1fr_1fr] gap-3 mt-3.5">
-                    <div>
-                      <div className="text-[10px] text-ink-3 font-extrabold tracking-[1.2px] uppercase">Budget</div>
-                      <div className="text-[15px] font-extrabold text-ink font-mono mt-0.75">₹ {t.budget.toLocaleString("en-IN")}</div>
-                    </div>
-                    <div>
-                      <div className="text-[10px] text-ink-3 font-extrabold tracking-[1.2px] uppercase">Approver</div>
-                      <div className="text-[13px] font-bold text-ink mt-0.75">{t.approver}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {t.status === "Completed" && (
-                  <div className="py-3 px-5 bg-g-mist border-t border-t-g-soft flex justify-between items-center">
-                    <div className="text-[11.5px] text-g-deep font-bold">Trip complete · ready for voucher</div>
-                    <button onClick={() => { setSelectedTrip(t); setShowVoucherModal(true); }} className="py-1.5 px-3 bg-g text-white border border-g rounded-[7px] text-[11.5px] font-bold font-sans cursor-pointer flex items-center gap-1.25">
-                      <Receipt size={12}/>Generate voucher
-                    </button>
-                  </div>
-                )}
-              </Card>
-            );
-          })}
-        </div>
+                      </td>
+                      <td className="py-3.25 px-4 text-[11.5px] text-ink-2 font-mono whitespace-nowrap">{t.dates}</td>
+                      <td className="py-3.25 px-4 font-mono text-[13px] font-extrabold text-ink whitespace-nowrap">₹ {t.budget.toLocaleString("en-IN")}</td>
+                      <td className="py-3.25 px-4 text-[12.5px] text-ink-2 whitespace-nowrap">{t.approver}</td>
+                      <td className="py-3.25 px-4">
+                        <Pill tone={t.status === "Approved" ? "ok" : t.status === "Pending" ? "amber" : t.status === "Completed" ? "neutral" : "info"} dot>{t.status}</Pill>
+                      </td>
+                      <td className="py-3.25 px-4 text-right">
+                        {t.status === "Completed" && (
+                          <button onClick={() => { setSelectedTrip(t); setShowVoucherModal(true); }} className="py-1.5 px-3 bg-g text-white border border-g rounded-[7px] text-[11.5px] font-bold font-sans cursor-pointer inline-flex items-center gap-1.25 whitespace-nowrap">
+                            <Receipt size={12}/>Generate voucher
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
 
       {/* EXPENSES TAB */}
@@ -192,8 +201,12 @@ export const TravelExpenses = () => {
                 <span className="font-mono text-[11.5px] text-ink-3 font-bold">{v.trip}</span>
                 <span className="text-[11.5px] text-ink-3">{v.issued}</span>
                 <span className="font-mono text-[14px] font-extrabold text-ink">₹ {v.total.toLocaleString("en-IN")}</span>
-                <div className="text-[11.5px] text-ink-3">Paid to <strong className="text-ink-2 font-mono">{v.paidTo}</strong> on {v.paidOn}</div>
-                <Pill tone="ok" dot>{v.status}</Pill>
+                <div className="text-[11.5px] text-ink-3">
+                  {v.paidOn
+                    ? <>Paid to <strong className="text-ink-2 font-mono">{v.paidTo}</strong> on {v.paidOn}</>
+                    : <>Payee <strong className="text-ink-2">{v.paidTo}</strong></>}
+                </div>
+                <Pill tone={v.status === "Paid" ? "ok" : "info"} dot>{v.status}</Pill>
                 <div className="flex gap-1.5 justify-end">
                   <Btn variant="ghost" size="sm" icon={Download}>PDF</Btn>
                 </div>
@@ -271,6 +284,9 @@ export const TravelExpenses = () => {
             </div>
           </div>
         </div>
+      )}
+      {showGenerate && (
+        <GenerateVoucherModal nextNumber={nextVoucherNumber} onClose={() => setShowGenerate(false)} onGenerated={handleGenerated}/>
       )}
     </div>
   );

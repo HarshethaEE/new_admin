@@ -136,3 +136,7 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--color-faint); border-radius: 4px; }
 }
+
+/* Find-in-page highlights (see shared/lib/useFindInPage.ts) */
+::highlight(find-match)   { background-color: #FDE68A; color: inherit; }
+::highlight(find-current) { background-color: #F59E0B; color: #fff; }

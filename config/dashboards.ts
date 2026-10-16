@@ -1,5 +1,5 @@
 import {
-  CalendarIcon, Clock, Cpu, FileCheck2, FileText, FolderKanban, GitBranch, Globe, Inbox, Key,
+  CalendarIcon, Clock, Cpu, FileCheck2, FileText, FolderKanban, GitBranch, Globe, Key,
   LayoutDashboard, Plane, Receipt, Settings, Sparkles, TrendingUp, User, UserPlus, Users, Wallet,
 } from "lucide-react";
 import { ADMIN_USER, ADMIN, ME } from "@/features/account";
@@ -21,16 +21,15 @@ const employee: DashboardConfig = {
   viewerSubtitle: `Employee · Rank #${ME.rank}`,
   logo: { label: "Energy", size: 32 },
   searchPlaceholder: "Search anything",
+  inbox: { badge: 6 },
   nav: [
     { slug: "home",        label: "Dashboard",         icon: LayoutDashboard },
     { slug: "projects",    label: "Projects & Tasks",  icon: FolderKanban, badge: TASKS.filter(t => t.assignee === "me" && t.status !== "completed").length },
     { slug: "calendar",    label: "Calendar",          icon: CalendarIcon },
-    { slug: "inbox",       label: "Inbox",             icon: Inbox, badge: 6 },
     { slug: "travel",      label: "Travel & Expenses", icon: Plane },
     { slug: "attendance",  label: "Attendance",        icon: Clock },
     { slug: "leave",       label: "Leave",             icon: FileText },
     { slug: "performance", label: "Performance",       icon: TrendingUp },
-    { slug: "payroll",     label: "Payroll",           icon: Wallet },
   ],
   bottomNav: [
     { label: "Profile",  icon: User },
@@ -47,9 +46,9 @@ const management: DashboardConfig = {
   viewerSubtitleAccent: true,
   logo: { label: "HR Console", size: 36, accentLabel: true },
   searchPlaceholder: "Search employees, requests, applicants…",
+  inbox: { badge: 6 },
   nav: [
     { slug: "home",        label: "Dashboard",            icon: LayoutDashboard },
-    { slug: "inbox",       label: "Inbox",                icon: Inbox, badge: 6 },
     { slug: "calendar",    label: "Calendar",             icon: CalendarIcon },
     { slug: "employees",   label: "Employees",            icon: Users },
     { slug: "attendance",  label: "Attendance Ops",       icon: Clock },

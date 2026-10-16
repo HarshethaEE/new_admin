@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Download, Key, MapPin, Plus, Search } from "lucide-react";
 import { purpleTheme as T } from "@/shared/theme";
+import { useFindInPage } from "@/shared/lib/useFindInPage";
 import { Avatar, Btn, Card, PageHeader, Pill } from "@/shared/ui";
 import { AccessDrawer } from "./AccessDrawer";
 import { CLIENTS } from "../data";
@@ -26,6 +27,9 @@ export const Clients = () => {
     });
   }, [filter, search]);
 
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const find = useFindInPage(resultsRef, search, [filtered]);
+
   return (
     <div>
       <PageHeader
@@ -42,7 +46,7 @@ export const Clients = () => {
       <div className="flex gap-2.5 mb-5 flex-wrap">
         <div className="flex items-center gap-2.25 bg-paper border border-border rounded-[10px] py-2.25 px-3.25 flex-1 min-w-70">
           <Search size={15} color={T.mute}/>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, city, industry…" className="flex-1 border-0 outline-none bg-transparent font-sans text-[13.5px] text-ink"/>
+          <input value={search} onChange={e => setSearch(e.target.value)} onKeyDown={find.onKeyDown} placeholder="Search by name, city, industry…" className="flex-1 border-0 outline-none bg-transparent font-sans text-[13.5px] text-ink"/>
         </div>
         {[
           { id: "all",       label: "All",        n: CLIENTS.length },
@@ -58,7 +62,7 @@ export const Clients = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(360px,1fr))] gap-4 mb-6">
+      <div ref={resultsRef} className="grid grid-cols-[repeat(auto-fill,minmax(360px,1fr))] gap-4 mb-6">
         {filtered.map(c => {
           const Icon = typeIcon(c.type);
           return (

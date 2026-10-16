@@ -34,6 +34,8 @@ export interface DashboardConfig {
   environment?: string;
   /** Small note under the role switcher. */
   switcherNote?: string;
+  /** Inbox shortcut in the top bar (left of Settings); the page lives at `${basePath}/inbox`. */
+  inbox?: { badge?: number };
   nav: NavItem[];
   bottomNav: BottomNavItem[];
 }

@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AlertTriangle, CheckCircle2, FolderKanban, GitBranch, Milestone, Plus, UserPlus } from "lucide-react";
+import { AlertTriangle, CheckCircle2, FolderKanban, GitBranch, Milestone, UserPlus } from "lucide-react";
 import { greenTheme as T } from "@/shared/theme";
 import { Avatar, Btn, Card, PageHeader, Pill } from "@/shared/ui";
 import { ME } from "@/features/account";
-import { DEADLINE_ALERTS, PROJECTS, TASKS, TEAM_MEMBERS } from "../data/employee";
+import { DEADLINE_ALERTS, PROJECTS, TASKS as INITIAL_TASKS, TEAM_MEMBERS } from "../data/employee";
+import { AssignTaskModal, type NewTask } from "./AssignTaskModal";
 
 /* ══════════════════════════════════════════════════════════════════════
    §04 · PROJECTS & TASKS — projects, tasks, timeline, deadlines
@@ -14,7 +15,17 @@ import { DEADLINE_ALERTS, PROJECTS, TASKS, TEAM_MEMBERS } from "../data/employee
 export const ProjectsTasks = () => {
   const [tab, setTab] = useState("overview");
   const [taskFilter, setTaskFilter] = useState("all");
-  const [assignmentModal, setAssignmentModal] = useState(null);
+  const [showAssign, setShowAssign] = useState(false);
+  const [TASKS, setTasks] = useState<NewTask[]>(INITIAL_TASKS);
+
+  const nextTaskId = useMemo(() => Math.max(0, ...TASKS.map(t => Number(t.id.replace(/\D/g, "")) || 0)) + 1, [TASKS]);
+
+  const handleCreate = (created: NewTask[]) => {
+    setTasks(prev => [...created, ...prev]);
+    setShowAssign(false);
+    setTaskFilter("all");
+    setTab("tasks");
+  };
 
   const filteredTasks = useMemo(() => {
     if (taskFilter === "all") return TASKS;
@@ -23,7 +34,7 @@ export const ProjectsTasks = () => {
     if (taskFilter === "on-hold") return TASKS.filter(t => t.status === "on-hold");
     if (taskFilter === "active") return TASKS.filter(t => t.status === "in-progress" || t.status === "todo");
     return TASKS;
-  }, [taskFilter]);
+  }, [taskFilter, TASKS]);
 
   return (
     <div>
@@ -31,10 +42,7 @@ export const ProjectsTasks = () => {
         title="Projects & Tasks"
         sub={`${PROJECTS.length} active projects · ${TASKS.filter(t => t.assignee === "me" && t.status !== "completed").length} of your tasks open`}
         action={
-          <div className="flex gap-2">
-            <Btn variant="ghost" icon={UserPlus}>Assign task</Btn>
-            <Btn variant="primary" icon={Plus}>New task</Btn>
-          </div>
+          <Btn variant="primary" icon={UserPlus} onClick={() => setShowAssign(true)}>Assign task</Btn>
         }
       />
 
@@ -87,55 +95,51 @@ export const ProjectsTasks = () => {
 
       {/* PROJECTS TAB */}
       {tab === "overview" && (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(380px,1fr))] gap-4">
-          {PROJECTS.map(p => (
-            <Card key={p.id} padding={0} className="overflow-hidden">
-              <div className="pt-4.5 pr-5 pb-3.5 pl-5">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex-1">
-                    <span className="text-[10.5px] text-ink-3 font-mono font-bold tracking-[1px]">{p.id}</span>
-                    <div className="text-[14.5px] font-bold text-ink tracking-[-0.3px] mt-0.75">{p.client}</div>
-                    <div className="text-[11.5px] text-ink-3 mt-0.75">{p.type}</div>
-                  </div>
-                  <Pill tone={p.status === "at-risk" ? "amber" : "ok"} dot>
-                    {p.status === "at-risk" ? "At risk" : "On track"}
-                  </Pill>
-                </div>
-
-                <div className="flex justify-between items-baseline mt-3.5 mb-1.5">
-                  <span className="text-[11px] text-ink-3 font-bold tracking-[1.2px] uppercase">Progress</span>
-                  <span className="text-[20px] font-extrabold text-g-deep font-mono tracking-[-0.6px]">{p.progress}%</span>
-                </div>
-                <div className="h-2 bg-g-mist rounded-[99px] overflow-hidden">
-                  <div className="h-full" style={{ width: `${p.progress}%`, background: p.status === "at-risk" ? `linear-gradient(90deg, ${T.a}, ${T.aDark})` : `linear-gradient(90deg, ${T.g}, ${T.gDeep})` }}/>
-                </div>
-
-                <div className="grid grid-cols-[1fr_1fr_1fr] gap-3 mt-3.5">
-                  <div>
-                    <div className="text-[10px] text-ink-3 font-extrabold tracking-[1.2px] uppercase">Tasks</div>
-                    <div className="text-[14px] font-extrabold text-ink font-mono mt-0.75">{p.tasksDone}/{p.tasksTotal}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-ink-3 font-extrabold tracking-[1.2px] uppercase">Team</div>
-                    <div className="text-[14px] font-extrabold text-ink font-mono mt-0.75">{p.team}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-ink-3 font-extrabold tracking-[1.2px] uppercase">Days left</div>
-                    <div className={`text-[14px] font-extrabold font-mono mt-0.75 ${(p.daysLeft < 30 ? "text-a" : "text-ink")}`}>{p.daysLeft}</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="py-3 px-5 bg-g-bg border-t border-t-border">
-                <div className="text-[10px] text-ink-3 font-extrabold tracking-[1.2px] uppercase mb-1">Next milestone</div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[13px] font-bold text-ink">{p.nextMilestone}</span>
-                  <Pill tone="amber" size="sm">{p.nextDeadline}</Pill>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+        <Card padding={0}>
+          <div className="overflow-x-auto">
+            <table className="w-full font-sans" style={{ borderCollapse: "collapse" }}>
+              <thead>
+                <tr className="bg-canvas">
+                  {["Project", "Client", "Role", "Progress", "Tasks", "Team", "Days left", "Next milestone", "Status"].map((h, i) => (
+                    <th key={i} className={`py-2.75 px-4 text-[10.5px] font-extrabold tracking-[1.4px] uppercase text-ink-3 border-b border-b-border whitespace-nowrap ${(i === -1 ? "text-right" : "text-left")}`}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {PROJECTS.map((p, i, arr) => (
+                  <tr key={p.id} className={`bg-paper hover:bg-g-bg ${(i < arr.length - 1 ? "border-b border-b-border" : "border-b-0")}`}>
+                    <td className="py-3.25 px-4">
+                      <span className="font-mono text-[11.5px] text-ink-3 font-bold whitespace-nowrap">{p.id}</span>
+                    </td>
+                    <td className="py-3.25 px-4">
+                      <div className="text-[13px] font-bold text-ink">{p.client}</div>
+                      <div className="text-[11px] text-ink-3 mt-0.5">{p.type}</div>
+                    </td>
+                    <td className="py-3.25 px-4 text-[12px] text-ink-2 whitespace-nowrap">{p.role}</td>
+                    <td className="py-3.25 px-4 min-w-35">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex-1 h-1.5 bg-g-mist rounded-[99px] overflow-hidden">
+                          <div className="h-full" style={{ width: `${p.progress}%`, background: p.status === "at-risk" ? `linear-gradient(90deg, ${T.a}, ${T.aDark})` : `linear-gradient(90deg, ${T.g}, ${T.gDeep})` }}/>
+                        </div>
+                        <span className="text-[12px] font-extrabold text-ink font-mono w-9 text-right">{p.progress}%</span>
+                      </div>
+                    </td>
+                    <td className="py-3.25 px-4 text-[12.5px] font-bold text-ink font-mono whitespace-nowrap">{p.tasksDone}/{p.tasksTotal}</td>
+                    <td className="py-3.25 px-4 text-[12.5px] font-bold text-ink font-mono">{p.team}</td>
+                    <td className={`py-3.25 px-4 text-[12.5px] font-extrabold font-mono ${(p.daysLeft < 30 ? "text-a" : "text-ink")}`}>{p.daysLeft}</td>
+                    <td className="py-3.25 px-4">
+                      <div className="text-[12.5px] font-bold text-ink whitespace-nowrap">{p.nextMilestone}</div>
+                      <div className="text-[11px] text-ink-3 mt-0.5 font-mono">{p.nextDeadline}</div>
+                    </td>
+                    <td className="py-3.25 px-4">
+                      <Pill tone={p.status === "at-risk" ? "amber" : "ok"} dot>{p.status === "at-risk" ? "At risk" : "On track"}</Pill>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
 
       {/* TASKS TAB */}
@@ -248,6 +252,10 @@ export const ProjectsTasks = () => {
             })}
           </div>
         </Card>
+      )}
+
+      {showAssign && (
+        <AssignTaskModal nextId={nextTaskId} onClose={() => setShowAssign(false)} onCreate={handleCreate}/>
       )}
     </div>
   );
