@@ -1,6 +1,6 @@
 import {
   CalendarIcon, Clock, Cpu, FileCheck2, FileText, FolderKanban, GitBranch, Globe, Key,
-  LayoutDashboard, Plane, Receipt, Settings, Sparkles, TrendingUp, User, UserPlus, Users, Wallet,
+  LayoutDashboard, Plane, Receipt, Settings, Sparkles, TrendingUp, User, UserPlus, Users,
 } from "lucide-react";
 import { ADMIN_USER, ADMIN, ME } from "@/features/account";
 import { CLIENTS } from "@/features/clients";
@@ -57,7 +57,6 @@ const management: DashboardConfig = {
     { slug: "performance", label: "Performance",          icon: TrendingUp },
     { slug: "leave",       label: "Leave Mgmt",           icon: FileText, badge: LEAVE_REQUESTS.length },
     { slug: "recruitment", label: "Recruitment",          icon: UserPlus, badge: APPLICANTS.filter(a => a.status === "new").length },
-    { slug: "payroll",     label: "Payroll",              icon: Wallet },
     { slug: "vouchers",    label: "Vouchers",             icon: Receipt, badge: 3 },
     { slug: "finance",     label: "Invoices & Proposals", icon: FileCheck2 },
   ],
