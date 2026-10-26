@@ -5,6 +5,7 @@ import {
 import { ADMIN_USER, ADMIN, ME } from "@/features/account";
 import { CLIENTS } from "@/features/clients";
 import { LEAVE_REQUESTS } from "@/features/leave";
+import { LEADERBOARD } from "@/features/performance";
 import { CLIENT_PROJECTS, TASKS } from "@/features/projects";
 import { APPLICANTS } from "@/features/recruitment";
 import type { DashboardConfig, DashboardId } from "@/shared/layout";
@@ -22,6 +23,7 @@ const employee: DashboardConfig = {
   logo: { label: "Energy", size: 32 },
   searchPlaceholder: "Search anything",
   inbox: { badge: 6 },
+  leaderboard: { entries: LEADERBOARD, slug: "performance" },
   nav: [
     { slug: "home",        label: "Dashboard",         icon: LayoutDashboard },
     { slug: "projects",    label: "Projects & Tasks",  icon: FolderKanban, badge: TASKS.filter(t => t.assignee === "me" && t.status !== "completed").length },

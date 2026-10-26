@@ -12,6 +12,16 @@ export interface NavItem {
   badge?: number;
 }
 
+export interface LeaderboardEntry {
+  rank: number;
+  name: string;
+  dept: string;
+  points: number;
+  delta: number;
+  /** The signed-in viewer's row. */
+  isMe?: boolean;
+}
+
 export interface BottomNavItem {
   /** Omit for items that don't have a page yet. */
   slug?: string;
@@ -36,6 +46,8 @@ export interface DashboardConfig {
   switcherNote?: string;
   /** Inbox shortcut in the top bar (left of Settings); the page lives at `${basePath}/inbox`. */
   inbox?: { badge?: number };
+  /** Crown button in the top bar (left of Inbox) showing the viewer's rank; `slug` is the full leaderboard page. */
+  leaderboard?: { entries: LeaderboardEntry[]; slug: string };
   nav: NavItem[];
   bottomNav: BottomNavItem[];
 }
