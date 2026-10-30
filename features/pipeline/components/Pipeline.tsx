@@ -43,6 +43,56 @@ const formatDate = (date: string) => {
 const fieldClassName =
   "h-10 w-full rounded-[10px] border border-border bg-paper px-3 text-[12px] text-ink outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15";
 
+type EditableField = "remarks" | "description";
+
+const EditableCell = ({
+  value,
+  label,
+  className,
+  onSave,
+}: {
+  value: string;
+  label: string;
+  className?: string;
+  onSave: (value: string) => void;
+}) => {
+  const [draft, setDraft] = useState<string | null>(null);
+
+  const commit = () => {
+    if (draft === null) return;
+    onSave(draft.trim() || "—");
+    setDraft(null);
+  };
+
+  if (draft !== null) {
+    return (
+      <textarea
+        autoFocus
+        aria-label={label}
+        className={`${fieldClassName} h-20 min-w-[180px] resize-y py-2 text-[11px]`}
+        value={draft}
+        onChange={(event) => setDraft(event.target.value)}
+        onBlur={commit}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") setDraft(null);
+          if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) commit();
+        }}
+      />
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      title={`Click to edit ${label.toLowerCase()}`}
+      className={`-mx-1.5 w-full cursor-text whitespace-pre-line rounded-md px-1.5 py-1 text-left hover:bg-canvas hover:ring-1 hover:ring-border ${className ?? ""}`}
+      onClick={() => setDraft(value === "—" ? "" : value)}
+    >
+      {value}
+    </button>
+  );
+};
+
 export const Pipeline = () => {
   const [opportunities, setOpportunities] = useState(PIPELINE_ITEMS);
   const [stageFilter, setStageFilter] = useState("");
@@ -87,6 +137,12 @@ export const Pipeline = () => {
     };
     setOpportunities((current) => [newOpportunity, ...current]);
     setIsAdding(false);
+  };
+
+  const updateOpportunity = (id: number, field: EditableField, value: string) => {
+    setOpportunities((current) =>
+      current.map((opportunity) => (opportunity.id === id ? { ...opportunity, [field]: value } : opportunity)),
+    );
   };
 
   return (
@@ -181,8 +237,20 @@ export const Pipeline = () => {
                   <td className="whitespace-nowrap px-3 py-3.5 font-semibold text-ink-2">{opportunity.next}</td>
                   <td className="px-3 py-3.5"><Pill tone={statusTone(opportunity.status)} dot>{opportunity.status}</Pill></td>
                   <td className="px-3 py-3.5 font-semibold text-ink-2">{opportunity.poc}</td>
-                  <td className="max-w-[180px] px-3 py-3.5 text-ink-2">{opportunity.remarks}</td>
-                  <td className="max-w-[260px] px-3 py-3.5 leading-5 text-ink-3">{opportunity.description}</td>
+                  <td className="max-w-[180px] px-3 py-3.5 text-ink-2">
+                    <EditableCell
+                      label="Remarks"
+                      value={opportunity.remarks}
+                      onSave={(value) => updateOpportunity(opportunity.id, "remarks", value)}
+                    />
+                  </td>
+                  <td className="max-w-[260px] px-3 py-3.5 leading-5 text-ink-3">
+                    <EditableCell
+                      label="Discussion Description"
+                      value={opportunity.description}
+                      onSave={(value) => updateOpportunity(opportunity.id, "description", value)}
+                    />
+                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
