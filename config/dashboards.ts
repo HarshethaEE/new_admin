@@ -1,6 +1,6 @@
 import {
   CalendarIcon, Clock, Cpu, FileCheck2, FileText, FolderKanban, GitBranch, Globe, Key,
-  LayoutDashboard, Plane, Receipt, Settings, Sparkles, TrendingUp, User, UserPlus, Users,
+  LayoutDashboard, NotebookPen, Plane, Receipt, Settings, Sparkles, TrendingUp, User, UserPlus, Users,
 } from "lucide-react";
 import { ADMIN_USER, ADMIN, ME } from "@/features/account";
 import { LEAVE_REQUESTS } from "@/features/leave";
@@ -80,6 +80,7 @@ const admin: DashboardConfig = {
     { slug: "home",     label: "Overview",        icon: LayoutDashboard },
     { slug: "projects", label: "Projects",        icon: FolderKanban, badge: CLIENT_PROJECTS.length },
     { slug: "pipeline", label: "Pipeline",        icon: GitBranch },
+    { slug: "mom",      label: "MOM",             icon: NotebookPen },
     { slug: "devices",  label: "Devices",         icon: Cpu },
     { slug: "ai",       label: "AI Intelligence", icon: Sparkles },
     { slug: "reports",  label: "Reports",         icon: FileText },
