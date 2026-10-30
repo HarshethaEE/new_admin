@@ -3,7 +3,6 @@ import {
   LayoutDashboard, Plane, Receipt, Settings, Sparkles, TrendingUp, User, UserPlus, Users,
 } from "lucide-react";
 import { ADMIN_USER, ADMIN, ME } from "@/features/account";
-import { CLIENTS } from "@/features/clients";
 import { LEAVE_REQUESTS } from "@/features/leave";
 import { LEADERBOARD } from "@/features/performance";
 import { CLIENT_PROJECTS, TASKS } from "@/features/projects";
@@ -79,7 +78,6 @@ const admin: DashboardConfig = {
   switcherNote: "Shared across employees + HR",
   nav: [
     { slug: "home",     label: "Overview",        icon: LayoutDashboard },
-    { slug: "clients",  label: "Clients",         icon: Users,        badge: CLIENTS.length },
     { slug: "projects", label: "Projects",        icon: FolderKanban, badge: CLIENT_PROJECTS.length },
     { slug: "pipeline", label: "Pipeline",        icon: GitBranch },
     { slug: "devices",  label: "Devices",         icon: Cpu },
